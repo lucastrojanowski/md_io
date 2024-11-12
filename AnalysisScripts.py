@@ -1,30 +1,5 @@
 import numpy as np, sys, time, inspect, os, pickle
 
-# def gaussian_to_pdb(gaussian_log, pdb_file):
-
-# THIS HAS NOT YET BEEN DEVELOPED.
-#     with open(gaussian_log, 'r') as log, open(pdb_file, 'w') as pdb:
-#         write_flag = False
-#         atom_number = 1
-#         for line in log:
-#             if 'Standard orientation:' in line:
-#                 write_flag = True
-#                 log.readline()  # Skip the next 4 header lines
-#                 log.readline()
-#                 log.readline()
-#                 log.readline()
-#             elif write_flag and '---------------------------------------------------------------------' in line:
-#                 break  # End of the atom list
-#             elif write_flag:
-#                 fields = line.split()
-#                 atom_type = int(fields[1])  # Atomic number
-#                 x = float(fields[3])
-#                 y = float(fields[4])
-#                 z = float(fields[5])
-#                 element = atomic_number_to_element(atom_type)
-#                 pdb.write(f"ATOM  {atom_number:5d}  {element:2s}   MOL     1     {x:8.3f}{y:8.3f}{z:8.3f}  1.00  0.00\n")
-#                 atom_number += 1
-
 def collect_atoms_in_cluster_distribution_from_directory(directory):
     atoms_in_cluster_distribution = []
 

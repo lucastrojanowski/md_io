@@ -1,5 +1,24 @@
 import numpy as np, sys, time, inspect, os, pickle
 
+def read_columns_from_file(file_path):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+    headers = lines[0].strip().replace(',', ' ').split()
+    data_dict = {header: [] for header in headers}
+
+    for line in lines[1:]:
+        values = line.strip().replace(',', ' ').split()
+        values = [float(value) for value in values]
+
+        for header, value in zip(headers, values):
+            data_dict[header].append(value)
+
+    for header in headers:
+        data_dict[header] = np.array(data_dict[header])
+
+    return data_dict
+
 def collect_atoms_in_cluster_distribution_from_directory(directory):
     atoms_in_cluster_distribution = []
 
@@ -668,31 +687,49 @@ if __name__=='__main__':
 
 def read_lammps_log_file(log_path):
     data_dict = {}
-
+    run_index = 0  # Track different runs
+    
     with open(log_path, 'r') as file:
-        lines = [line.strip() for line in file if line.strip()] #Discard any empty lines
+        lines = [line.strip() for line in file if line.strip()]  # Discard any empty lines
         header_found = False
         headers = []
-        
+
         for line in lines:
-                if line.strip().split()[0]=="Step":
-                    headers = line.split()  # Column headers
-                    header_found = True
+            if line.startswith("Step"):
+                headers = line.split()  # Column headers
+                header_found = True
+                # Initialize lists for each header in the dictionary for this run
+                for header in headers:
+                    # Create sublists for each run, if not already present
+                    if header not in data_dict:
+                        data_dict[header] = []
+                    data_dict[header].append([])  # Add a sublist for the new run
+                continue
 
-                    # Initialize lists for each header in the dictionary
-                    data_dict = {header: [] for header in headers}
-                    continue
+            # Stop loading data when a "Loop" line is found
+            if line.startswith("Loop"):
+                header_found = False
+                run_index += 1
+                continue
 
-                if header_found:
-                    if line.strip().split()[0]=='Loop':
-                        break
-                    values = line.split()
-                    for header, value in zip(headers, values):
-                        data_dict[header].append(float(value))
+            # If within a header-defined section, load data values
+            if header_found:
+                values = line.split()
+                for header, value in zip(headers, values):
+                    # Append data to the current run's sublist
+                    data_dict[header][run_index].append(float(value))
 
+        # Convert each sublist to a numpy array for each run
         for header in headers:
-            data_dict[header]=np.array(data_dict[header])
-            
+            data_dict[header] = [np.array(run) for run in data_dict[header]]
+        
+        for i in list(data_dict.keys()):
+            hold =[]
+            for j in range(len(data_dict[i])):
+                for k in data_dict[i][j]:
+                    hold.append(k)
+            data_dict[i] = np.array(hold)
+
     return data_dict
 
 def write_log_file_to_csv(log_file, out_path):
@@ -714,9 +751,6 @@ def moving_average(input, n):
     for i in range(L):
         output.append(np.average(input[i:min(i+n,L)]))
     return output
-
-import numpy as np
-import matplotlib.pyplot as plt
 
 def autocorrelation(x, y):
     """

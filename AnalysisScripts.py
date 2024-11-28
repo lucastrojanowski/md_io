@@ -1,5 +1,23 @@
 import numpy as np, sys, time, inspect, os, pickle
 
+def read_LiquidLib_iqt_data(data_path):
+    with open(data_path, 'r') as doc:
+        iqt_data = {}; lines = doc.readlines(); i = 2
+        while lines[i].strip().split()!=['#', 't', 'F(k,', 't)']:
+            iqt_data[round(float(lines[i]),3)]=[]
+            i+=1
+
+        z = i; iqt_data['t']=[]
+
+        for i in range(z+1, len(lines)):
+            iqt_data['t'].append(float(lines[i].strip().split()[0]))
+            for k in range(1, len(lines[i].strip().split())):
+                iqt_data[list(iqt_data.keys())[k-1]].append(float(lines[i].strip().split()[k]))
+
+        for key in iqt_data.keys():
+            iqt_data[key]=np.array(iqt_data[key])
+    return iqt_data
+
 def read_columns_from_file(file_path):
     with open(file_path, 'r') as file:
         lines = file.readlines()

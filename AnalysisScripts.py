@@ -3,7 +3,7 @@ import numpy as np, sys, time, inspect, os, pickle
 def read_LiquidLib_iqt_data(data_path):
     with open(data_path, 'r') as doc:
         iqt_data = {}; lines = doc.readlines(); i = 2
-        while lines[i].strip().split()!=['#', 't', 'F(k,', 't)']:
+        while lines[i].strip().split()[0:2]!= ['#', 't']:
             iqt_data[round(float(lines[i]),3)]=[]
             i+=1
 

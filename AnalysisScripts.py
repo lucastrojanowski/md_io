@@ -18,9 +18,12 @@ def read_LiquidLib_iqt_data(data_path):
             iqt_data[key]=np.array(iqt_data[key])
     return iqt_data
 
-def read_columns_from_file(file_path):
+def read_columns_from_file(file_path, LL = True):
     with open(file_path, 'r') as file:
-        lines = file.readlines()
+        if LL == True:
+            lines = file.readlines()[1:]
+        else: 
+            lines = file.readlines()
 
     headers = lines[0].strip().replace(',', ' ').split()
     data_dict = {header: [] for header in headers}

@@ -19,25 +19,25 @@ def read_LiquidLib_iqt_data(data_path):
     return iqt_data
 
 def read_columns_from_file(file_path, LL = True):
+    
     with open(file_path, 'r') as file:
         if LL == True:
             lines = file.readlines()[1:]
-        else: 
-            lines = file.readlines()
-
+        else: lines = file.readlines()
+            
     headers = lines[0].strip().replace(',', ' ').split()
-    data_dict = {header: [] for header in headers}
-
+    data_dict = {header: [] for header in headers[1:]}
+    
     for line in lines[1:]:
         values = line.strip().replace(',', ' ').split()
         values = [float(value) for value in values]
 
-        for header, value in zip(headers, values):
+        for header, value in zip(headers[1:], values):
             data_dict[header].append(value)
 
-    for header in headers:
+    for header in headers[1:]:
         data_dict[header] = np.array(data_dict[header])
-
+    
     return data_dict
 
 def collect_atoms_in_cluster_distribution_from_directory(directory):

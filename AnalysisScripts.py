@@ -18,7 +18,6 @@ def read_LiquidLib_iqt_data(data_path):
             iqt_data[key]=np.array(iqt_data[key])
     return iqt_data
 
-import numpy as np
 def read_columns_from_file(file_path, LL = True):
     
     with open(file_path, 'r') as file:
@@ -725,6 +724,44 @@ if __name__=='__main__':
     for name, _ in functions:
         if not name.startswith("__"): 
             print(name)
+
+def reduce_lammps_log_file(log_path, n, new_path):
+    
+    with open(log_path, 'r') as file:
+        lines = [line.strip() for line in file]
+        header_found = False
+        lines2 = []
+
+        for line in lines:
+            if line.startswith("Step"):
+                header_found = True
+                lines2.append(line)
+                continue
+
+            if line.startswith("Loop"):
+                lines2.append(line)
+                header_found = False
+                run_index += 1
+                continue
+
+            if header_found:
+                if float(line.strip().split(' ')[0])%n==0:
+                    lines2.append(line)
+                else:
+                    continue
+                
+            if not header_found:
+                lines2.append(line)
+                
+        file.close()
+        
+    with open(new_path, 'w') as file:
+        for line in lines2:
+            file.write(line+'\n')
+        file.close
+        
+    print(f'Saved every {n}th step to {new_path}')
+
 
 def read_lammps_log_file(log_path):
     data_dict = {}

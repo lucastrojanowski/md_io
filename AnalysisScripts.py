@@ -726,7 +726,7 @@ if __name__=='__main__':
             print(name)
 
 def reduce_lammps_log_file(log_path, n, new_path):
-    
+
     with open(log_path, 'r') as file:
         lines = [line.strip() for line in file]
         header_found = False
